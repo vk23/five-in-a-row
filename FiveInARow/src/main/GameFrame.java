@@ -7,11 +7,11 @@ package main;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -25,10 +25,11 @@ public class GameFrame extends JFrame {
         private Cell[] cells=new Cell[DIM*DIM];    //Массив игровых клеток.
         private int[][] data=new int[DIM][DIM];   //Массив для сохранения данных и расчета игры.
         private Fishka fishka;
-        private Sender thread;
+        private Sender sender;
         private boolean moveDone=false;
         private int lastIndex;
-        private Color defaultCellColor;
+        private Color defaultCellColor=Helper.DEFAULT_COLOR;
+        //private boolean gameEnded=false;
         private JMenuBar menuBar;
         private InfoPanel infoPanel;
         private JPanel cellPanel;
@@ -39,10 +40,10 @@ public class GameFrame extends JFrame {
          * @throws java.io.IOException
          */
         public GameFrame(Fishka f) throws IOException {
-                super("Крестики-нолики 0.2b");
-                fishka=f;
-                thread=new Host(this);                
+                super("Крестики-нолики");
+                fishka=f;                
                 initGame(true);
+                sender=new Host(this);
                 moveDone=true;  //Первым ходит хост.
         }
 
@@ -52,10 +53,10 @@ public class GameFrame extends JFrame {
          * @throws java.io.IOException
          */
         public GameFrame(Fishka f,String addr) throws IOException {
-                super("Крестики-нолики 0.2b");
+                super("Крестики-нолики");
                 fishka=f;
-                thread=new Client(this,addr);                
                 initGame(false);
+                sender=new Client(this,addr);                
         }
 
         //Инициализация компонентов.
@@ -67,23 +68,23 @@ public class GameFrame extends JFrame {
                 setLayout(new BorderLayout());
 
                 //Создаем панель меню.
-                menuBar=new Menu();
+                menuBar=new Menu(this);
                 setJMenuBar(menuBar);
 
                 //Создаем клеточное поле.
                 cellPanel=new JPanel(new GridLayout(DIM, DIM));
                 add(cellPanel);
-                //Заполнение поля клетками.
-                long start=System.currentTimeMillis();                  //Старт-таймер вычисляющий время создания клеток на поле.
-                fillTheField(disableButtons);
-                long stop=System.currentTimeMillis();                   //Стоп-таймер
-                System.out.println("Arrray filled in "+(stop-start));   //Вывод времени в консоль.
+                
+                //Заполнение поля клетками.                
+                fillTheField(disableButtons);                
+
+                //Создаем массив значений.
+                data=new int[DIM][DIM];
 
                 //Создаем информационную панель внизу окна.
                 infoPanel=new InfoPanel();
                 add(infoPanel,BorderLayout.SOUTH);
                 
-                defaultCellColor=cells[0].getBackground();
                 //Добавляем прослушивание закрытия окна - завершение работы программы.
                 addWindowListener(new WindowAdapter() {
                         public void windowClosing(WindowEvent we) {
@@ -101,11 +102,11 @@ public class GameFrame extends JFrame {
                 pack();                
         }
 
-        /**Установка данных по-умолчанию(из сети)          
+        /**Установка данных по-умолчанию(из сети). Смотри setData(int row,int col, Fishka fishka,boolean fromNet);
          */
-        public void setData(int row,int col,Fishka fishka) {
-                setData(row, col, fishka, true);
+        public void setData(int row,int col,Fishka fishka) {                
                 moveDone=true;                  //Ход противника совершен, игрок может ходить.
+                setData(row, col, fishka, true);
         }
 
         /**Установка данных с параметром, указывающим откуда получены данные(из сети или в результате клика на игровом поле).
@@ -119,23 +120,31 @@ public class GameFrame extends JFrame {
                 cells[row*DIM+col].setField(fishka.getIcon());
                 //Подсветка последнего совершенного хода.
                 showLastMove(row, col);
-                //Запускаем подсчет элементов, выстроенных в ряд.
-                int[] winRow=new Calculation(row, col, data).calculate();
-                //Если получен массив (не null), значит получена выигрышная комбинация. Завершаем игру.
-                if(winRow!=null) {
-                        System.out.println("We have a winner: "+fishka.get());
-                        endGame(winRow, col);
-                }
+                
                 try{
                         //если данные получены не из сети, тогда создаем объект для сериализации и отправляем его по сети.
                         if(!fromNet) {
-                                thread.sendData(new Move(row, col, fishka)); 
+                                sender.sendData(new Move(row, col, fishka));
                                 waitForNextMove();
                         }
                 }
                 catch(IOException e) {
                         System.out.println(e);
                 }
+                
+                //Запускаем подсчет элементов, выстроенных в ряд.
+                int[] winRow=new Calculation(row, col, data).calculate();
+                //Если получен массив (не null), значит получена выигрышная комбинация. Завершаем игру.
+                if(winRow!=null) {
+                        System.out.println("We have a winner: "+fishka.get());
+                        endGame(winRow, fishka.get());
+                        System.out.println("MoveDone="+moveDone);
+                        return;
+                }
+                
+                //Чей ход.
+                String text=(moveDone ? "Ваш ход" : "Ожидание хода");
+                infoPanel.setInfoLabel(text);
         }
 
         //Возвращаем массив значений.
@@ -154,34 +163,70 @@ public class GameFrame extends JFrame {
                         int index=winRow[i]*DIM+winRow[i+1];
                         cells[index].setEnabled(true);
                         cells[index].setRolloverEnabled(false); 
-                }
+                }                
+                infoPanel.setInfoLabel("The End. Winner: "+fishka);
         }
         /**Чтобы ждать хода противника устанавливаем значение переменной в ложь.
          */
         public void waitForNextMove() {
-                moveDone=false;
+                moveDone=false;               
         }
         /**Проверяем сделал ли противник свой ход.
+         * @return Возвращает true если противник сделал свой ход.
          */
         public boolean isMoveDone() {
                 return moveDone;
         }
+        /**
+         * Проверяет закончилась ли игра.
+         * @return
+         */
+//        public boolean isGameEnded() {
+//                return gameEnded;
+//        }
+//        public void setNewGameStarted() {
+//                gameEnded=false;
+//        }
+        
         //Подсветка последнего хода.
         private void showLastMove(int x,int y) {
                 //Возвращаем цвет фона ПРЕДПОСЛЕДНЕГО хода.
                 cells[lastIndex].setBackground(defaultCellColor);
                 int index=x*DIM+y;
                 //Устанавливаем  цвет последнего хода.
-                cells[index].setBackground(Color.YELLOW);
+                cells[index].setBackground(new Color(150,255,130));
                 lastIndex=index;
         }
         /**Начинаем игру(делаем кнопки активными).
          */
-        public void startGame() {
+        public void fillCellArray() {
                 for(Cell cell:cells) {
                         cell.setEnabled(true);                        
                 }
         }
+        /**
+         * Перезапуск игры. Розыгрыш первого хода. Перезаполнение игрового поля. Отправка данных по сети.
+         * @throws java.io.IOException
+         */
+        public void restartGame() throws IOException {
+                
+                Random rnd=new Random();
+                boolean myFirstMove=rnd.nextBoolean();
+                moveDone=myFirstMove;
+                NewGame newGame=new NewGame(!myFirstMove);
+                sender.sendNewGame(newGame);
+                
+                restoreTheField();
+        }
+        /**
+         * Перезапуск  игры по данным полученым из сети.
+         * @param firstMove первый ход.
+         */
+        public void restartGame(boolean firstMove) {               
+                moveDone=firstMove;
+                restoreTheField();
+        }
+
         /**Заполняем игровое поле клетками.
          * Если disableButtons=true, тогда временно блокируем клетки до сетевого соединения(хост).
          * */
@@ -192,6 +237,21 @@ public class GameFrame extends JFrame {
                                 cells[i].setEnabled(false);
                         }
                         cellPanel.add(cells[i],i);
-                }    
+                }
+                cellPanel.validate();
+        }
+        private void restoreTheField() {
+                //Удаляем и создаем новые клетки.
+                cellPanel.removeAll();
+                fillTheField(false);
+                cellPanel.validate();
+                //Создаем новый массив значений.
+                data=new int[DIM][DIM];
+
+//                setNewGameStarted();
+                System.out.println("new game started");
+                //Чей первый ход.
+                String moveText=(moveDone ? "Ваш ход" : "Ходит ваш оппонент");
+                infoPanel.setInfoLabel("Розыгрыш первого хода: "+moveText);
         }
 }

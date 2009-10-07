@@ -5,6 +5,7 @@
 
 package main;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
@@ -19,4 +20,6 @@ public class Helper {
         public static final int SIDE_LENGTH=20;                                   //Количество клеток в ширину, высоту(квадратное поле).
         public static final Font SMALL_FONT=new Font("Sans", Font.PLAIN, 12);
         public static final Font BIG_FONT=new Font("Sans",Font.BOLD,14);
+        public static final Color DEFAULT_COLOR=new Color(238,238,238);
+        public static final int PORT=6666;
 }

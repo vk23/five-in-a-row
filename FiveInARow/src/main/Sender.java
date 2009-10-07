@@ -18,4 +18,10 @@ interface Sender {
          * @throws java.io.IOException
          */
         public void sendData(Move move) throws IOException;
+        /**
+         * Отправить по сети объект, сигнализирующий о начале новой игры.
+         * @param newGame объект, содержащий информацию о начале новой игры.
+         * @throws java.io.IOException
+         */
+        public void sendNewGame(NewGame newGame) throws IOException;
 }

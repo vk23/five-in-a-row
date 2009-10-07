@@ -26,6 +26,9 @@ public class InfoPanel extends JPanel{
                 information.setFont(Helper.SMALL_FONT);
 //                information.setHorizontalTextPosition(JLabel.RIGHT);
 //                information.setHorizontalAlignment(JLabel.RIGHT);
-                add(information);
+                add(information,BorderLayout.EAST);
+        }
+        public void setInfoLabel(String text) {
+                information.setText(text); 
         }
 }

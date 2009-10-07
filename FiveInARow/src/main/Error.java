@@ -5,7 +5,6 @@
 
 package main;
 
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
@@ -28,7 +27,7 @@ public class Error extends JDialog implements ActionListener{
          * @param error информация об ошибке.
          */
         public Error(JFrame game,String error) {
-                super(game,"Error");
+                super(game,"Oops!");
                 Point p=Helper.START_LOCATION;
                 setLocation(new Point(p.x+150,p.y+200));                
                 setLayout(new GridLayout(2,1));
@@ -55,5 +54,6 @@ public class Error extends JDialog implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
                 this.dispose();
+                System.exit(1);
         }
 }

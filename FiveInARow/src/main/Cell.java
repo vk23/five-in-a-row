@@ -15,10 +15,14 @@ import javax.swing.JButton;
  * @author kaligula
  */
 public class Cell extends JButton implements ActionListener{
-        private final int ID;               //Уникальный номер клетки, необходим для получения координат на поле.
-        private boolean first=true;     //Первый клик на клетке?
+        private final int ID;               //Уникальный номер клетки, необходим для получения координат на поле.        
         private GameFrame gamefrm;
         private Fishka fishka;
+        /**
+         * Сигнализирует о том, что в клетке произошли изменения.
+         */
+        public boolean changed=false;
+        
         /**
          * Конструктор, создающий игровую клетку.
          * @param gf ссылка на игровое поле.
@@ -35,16 +39,17 @@ public class Cell extends JButton implements ActionListener{
                 addActionListener(this); 
         } 
         /**Нажатие на клетке.
-         * @param e
+         * @param e событие.
          */
         public void actionPerformed(ActionEvent e) {
-                if(first && gamefrm.isMoveDone()) {
+                if(!changed && gamefrm.isMoveDone()) {
                         //Исходя из значения номера клетки, получаем ее координаты и устанавливаем новое значение на поле.
                         int x,y;
                         x=ID/Helper.SIDE_LENGTH;
                         y=ID%Helper.SIDE_LENGTH;                        
                         gamefrm.setData(x, y,fishka,false);
-                        first=false;
+                        //Флаг, сигнализирующий о том, что клетка уже была изменена.
+                        changed=true;
                 }
                 
         }

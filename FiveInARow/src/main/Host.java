@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
 
 /**
  *Класс-поток хоста. Создает сервер-сокет и общается по сети.
@@ -20,40 +21,15 @@ public class Host implements Sender,Runnable{
         private Socket socket;
         private ObjectOutputStream out;
         private GameFrame game;
+        
         /**
          * Конструктор серверного потока.
          * @param gf ссылка на игровое поле хоста.
          * @throws java.io.IOException
          */
-        public Host(GameFrame gf) throws IOException {
-                //Создаем сервер-сокет и запускаем поток.
-                server=new ServerSocket(6666);
+        public Host(GameFrame gf)  {
                 game=gf;
                 new Thread(this).start();
-        }
-
-        public void run() {
-                try {
-                        //Принимаем входящее подключение (только 1).
-                        socket = server.accept();
-                        System.out.println("Host: Socket accepted: "+socket.getInetAddress().toString());
-                        //Запускаем игру - делаем клетки активными.
-                        game.startGame();
-                        //Получаем потоки, связанные с данным соединением.
-                        out=new ObjectOutputStream(socket.getOutputStream());
-                        ObjectInputStream in=new ObjectInputStream(socket.getInputStream());
-                        //Читаем входящий сетевой поток.
-                        while(true) {
-                                Thread.sleep(500);
-                                        Move move=(Move)in.readObject();                //Читаем объект из сети и десериализуем его.
-                                        game.setData(move.x, move.y, move.fishka);   //Устанавливаем значения клетки, полученной из сети.
-                        }                                       
-                } catch(InterruptedException ex) {
-                        new Error(game, "Host-thread interrupted!");
-                } catch(Exception exc) {
-                        System.out.println(exc);
-                        new Error(game,"Connection problem!");
-                }
         }
         /**
         *Отправка данных по сети, после клика на клетке.
@@ -64,4 +40,51 @@ public class Host implements Sender,Runnable{
                 out.flush();                 
                 System.out.println("Object written");
         }
+        /**
+         * Отправка данных по сети для создания новой игры.
+         * @param newGame
+         * @throws java.io.IOException
+         */
+        public void sendNewGame(NewGame newGame) throws IOException {               
+                //Сериализация и запись объекта в сетевой поток.
+                out.writeObject(newGame);
+                out.flush();
+                System.out.println("Object written");
+        }
+        public void run() {
+                try {
+                        server = new ServerSocket(Helper.PORT);
+                        socket=server.accept();
+
+                        //Создаем потоки, связанные с сокетом.
+                        out=new ObjectOutputStream(socket.getOutputStream());
+                        ObjectInputStream in=new ObjectInputStream(socket.getInputStream());
+
+                        //Делаем клетки активными, т.к. подключился клиент
+                        game.fillCellArray();
+                        
+                        //Читаем сообщения из сети.
+                        while(true) {
+                                TimeUnit.MILLISECONDS.sleep(750);
+                                Object obj=in.readObject();
+                                if(obj instanceof Move) {
+                                        Move move=(Move)obj;
+                                        game.setData(move.x, move.y, move.fishka);
+                                }
+                                else {
+                                        NewGame newGame=(NewGame)obj;
+                                        game.restartGame(newGame.firstMove);
+                                }
+                        }
+                        
+                } catch (IOException ex) {
+                        new Error(game, "Connection problem");
+                } catch (InterruptedException ex) {
+                        new Error(game, ex.toString());
+                } catch (ClassNotFoundException ex) {
+                        new Error(game, ex.toString());
+                } catch (ClassCastException ex) {
+                        new Error(game, ex.toString());
+                }
+        }        
 }

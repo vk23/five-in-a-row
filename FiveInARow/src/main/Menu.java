@@ -7,23 +7,28 @@ package main;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.UIManager;
 
 /**
  *Создает панель меню.
  * @author kaligula
  */
 public class Menu extends JMenuBar implements ActionListener{
+        private GameFrame gameFrame;
         private JMenu mainMenu,helpMenu;
         private JMenuItem start, sound,exit,help,about;
         /**
          * Создает панель меню.
+         * @param gameFrame ссылка на игровое поле.
          */
-        public Menu() {
+        public Menu(GameFrame gameFrame) {
                 super();
+                this.gameFrame=gameFrame;
                 initMenu();
         }
         //Инициализация элементов меню.
@@ -38,7 +43,7 @@ public class Menu extends JMenuBar implements ActionListener{
                 add(helpMenu);
 
                 //Создаем элементы меню.
-                start=new JMenuItem("Start");
+                start=new JMenuItem("New game");
                 sound=new JMenuItem("Sound");
                 exit=new JMenuItem("Exit");
                 about=new JMenuItem("About");
@@ -60,11 +65,24 @@ public class Menu extends JMenuBar implements ActionListener{
                 helpMenu.add(about);
         }
 
-        @Override
+        /**
+         * Обработка событий меню.
+         * @param e
+         */
         public void actionPerformed(ActionEvent e) {
+                //Название произошедшего события.
                 String action=e.getActionCommand();
+                //Выход из программы.
                 if(action.equalsIgnoreCase("exit")) {
                         System.exit(0);
+                }
+                //Перезапуск игры.
+                if(action.equalsIgnoreCase("new game")) {                        
+                                try {
+                                        gameFrame.restartGame();
+                                } catch (IOException ex) {
+                                        new Error(this.gameFrame,"IOException within restartGame()");
+                                }                        
                 }
         }
 }
