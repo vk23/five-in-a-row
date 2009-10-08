@@ -39,10 +39,11 @@ public class GameFrame extends JFrame {
          * @param player объект-игрок.
          * @throws java.io.IOException
          */
-        public GameFrame(Player player) throws IOException {
+        public GameFrame(Player player) throws IOException, InterruptedException {
                 super("Крестики-нолики");
                 this.player=player;                
                 initGame(true);
+                
                 sender=new Transporter(this);
                 moveDone=true;  //Первым ходит хост.
         }
@@ -55,7 +56,7 @@ public class GameFrame extends JFrame {
         public GameFrame(Player player, String addr) throws IOException {
                 super("Крестики-нолики");
                 this.player=player;
-                initGame(false);
+                initGame(true);
                 sender=new Transporter(this,addr);
         }
 

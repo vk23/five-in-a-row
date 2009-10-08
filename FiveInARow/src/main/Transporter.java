@@ -24,29 +24,25 @@ public class Transporter implements Sender,Runnable{
         private ObjectOutputStream out;
         private ObjectInputStream in;
         private GameFrame game;
-        
+        private InetAddress ip;
         /**
          * Конструктор серверного потока.
          * @param gf ссылка на игровое поле хоста.
-         * @throws java.io.IOException
          */
-        public Transporter(GameFrame gf) throws IOException  {
-                game=gf;
-                server = new ServerSocket(Helper.PORT);
-                socket=server.accept();
+        public Transporter(GameFrame gf) {
+                game=gf;                
                 new Thread(this).start();
         }
         /**
          * Конструктор клиентского потока.
          * @param gf ссылка на игровое поле клиента.
-         * @param ipAdr IP адрес хоста.
+         * @param ip_addr IP адрес хоста.
          * @throws java.net.UnknownHostException
-         * @throws java.io.IOException
          */
-        public Transporter(GameFrame gf,String ipAdr) throws UnknownHostException, IOException {
+        public Transporter(GameFrame gf,String ip_addr) throws UnknownHostException {
                 game=gf;
-                InetAddress ip=InetAddress.getByName(ipAdr);
-                socket=new Socket(ip,Helper.PORT);
+                InetAddress inet=InetAddress.getByName(ip_addr);
+                ip=inet;                
                 new Thread(this).start();
         }
 
@@ -83,7 +79,15 @@ public class Transporter implements Sender,Runnable{
         }
         
         public void run() {
-                try {                       
+                try {
+                        //Если не указан адрес, то создаем серверный сокет, иначе подключаюсь к существующему сокету.
+                        if(ip==null) {
+                                server = new ServerSocket(Helper.PORT);
+                                socket=server.accept();
+                        }
+                        else {
+                                socket=new Socket(ip,Helper.PORT);
+                        }
                         //Создаем потоки, связанные с сокетом.
                         out=new ObjectOutputStream(socket.getOutputStream());
                         in=new ObjectInputStream(socket.getInputStream());
