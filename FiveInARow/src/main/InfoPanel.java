@@ -14,7 +14,7 @@ import javax.swing.JPanel;
  * @author kaligula
  */
 public class InfoPanel extends JPanel{
-        private JLabel information;
+        private JLabel information,players;
 
         /**
          * Конструктор информационной панели.
@@ -22,13 +22,19 @@ public class InfoPanel extends JPanel{
         public InfoPanel() {
                 setLayout(new BorderLayout());
 
+                players=new JLabel("Player vs Player");
+                players.setFont(Helper.SMALL_FONT);
+                add(players,BorderLayout.WEST);
+                
                 information=new JLabel("gl&hf");
                 information.setFont(Helper.SMALL_FONT);
-//                information.setHorizontalTextPosition(JLabel.RIGHT);
-//                information.setHorizontalAlignment(JLabel.RIGHT);
                 add(information,BorderLayout.EAST);
         }
         public void setInfoLabel(String text) {
                 information.setText(text); 
+        }
+
+        public void setPlayersInfo(Player player1,Player player2) {
+                players.setText(player1.getName()+" vs "+player2.getName()+" "+player1.getWins()+":"+player2.getWins());
         }
 }

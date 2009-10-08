@@ -32,45 +32,7 @@ public class Client implements Sender,Runnable{
                 this.ip_str=ip_str;
                 new Thread(this).start();
         }
-
-//
-//        public void run() {
-//                try{
-//
-//                        //Соединяемся с хостом.
-//                        InetAddress ip=Inet4Address.getByName(ip_str);
-//                        socket=new Socket(ip, 6666);
-//                        System.out.println("Client: Socket connected");
-//
-//                        //Получаем потоки, связаные с сокетом.
-//                        out=new ObjectOutputStream(socket.getOutputStream());
-//                        ObjectInputStream in=new ObjectInputStream(socket.getInputStream());
-//
-//                        //Читаем входящий поток.
-//                        while(true) {
-//                                Thread.sleep(1000);
-//                                if(!game.isGameEnded()) {
-//                                        Move move=(Move)in.readObject();
-//                                        game.setData(move.x, move.y, move.fishka);
-//                                }
-//                                else {
-//                                        NewGame newGame=(NewGame)in.readObject();
-//                                        game.restartGame(newGame.firstMove);
-////                                        game.setNewGameStarted();
-//                                }
-//                        }
-//                }
-//                catch(InterruptedException exc) {
-//                        new Error(game,"Client-thread interrupted!");
-//                }
-//                catch(ClassCastException exc) {
-//                        new Error(game,exc.toString());
-//                }
-//                catch(Exception exc) {
-//                        System.out.println(exc);
-//                        new Error(game,exc.toString());
-//                }
-//        }
+        
         /**Отправка данных по сети.
          *
          * @param move сериализованный объект, содержащий информацию о совершенном ходе.
@@ -91,6 +53,17 @@ public class Client implements Sender,Runnable{
                 out.flush();
                 System.out.println("Client:Object written");
         }
+        /**
+         * Посылает информацию об игроке.
+         * @param player объект-игрок.
+         * @throws java.io.IOException
+         */
+        public void sendNewPlayerInfo(Player player) throws IOException{
+                 //Сериализация и запись объекта в сетевой поток.
+                out.writeObject(player);
+                out.flush();
+                System.out.println("Client:Object written");
+        }
 
         public void run() {
                 try {
@@ -101,17 +74,25 @@ public class Client implements Sender,Runnable{
                         out=new ObjectOutputStream(socket.getOutputStream());
                         ObjectInputStream in=new ObjectInputStream(socket.getInputStream());
 
+                        //Отсылаем данные об игроке.
+                        sendNewPlayerInfo(game.getPlayer());
+                        
                         //Читаем сообщения из сети.
                         while(true) {
                                 TimeUnit.MILLISECONDS.sleep(750);
                                 Object obj=in.readObject();
-                                if(obj instanceof Move) {
-                                        Move move=(Move)obj;
-                                        game.setData(move.x, move.y, move.fishka);
+                                
+                                if(obj instanceof Player) {
+                                        Player player=(Player)obj;
+                                        game.setNewPlayerInfo(player);
                                 }
-                                else {
+                                else if(obj instanceof NewGame){
                                         NewGame newGame=(NewGame)obj;
                                         game.restartGame(newGame.firstMove);
+                                }
+                                else {
+                                        Move move=(Move)obj;
+                                        game.setData(move.x, move.y, move.fishka);
                                 }
                         }
 

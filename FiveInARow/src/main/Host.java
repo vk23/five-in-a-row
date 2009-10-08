@@ -52,6 +52,18 @@ public class Host implements Sender,Runnable{
                 out.flush();
                 System.out.println("Object written");
         }
+        /**
+         * Посылает информацию об игроке.
+         * @param player объект-игрок.
+         * @throws java.io.IOException
+         */
+        public void sendNewPlayerInfo(Player player) throws IOException{
+                 //Сериализация и запись объекта в сетевой поток.
+                out.writeObject(player);
+                out.flush();
+                System.out.println("Client:Object written");
+        }
+        
         public void run() {
                 try {
                         server = new ServerSocket(Helper.PORT);
@@ -62,19 +74,26 @@ public class Host implements Sender,Runnable{
                         in=new ObjectInputStream(socket.getInputStream());
 
                         //Делаем клетки активными, т.к. подключился клиент
-                        game.fillCellArray();
+                        game.enableCells();
+                        //Отсылаем данные об игроке.
+                        sendNewPlayerInfo(game.getPlayer());
                         
                         //Читаем сообщения из сети.
                         while(true) {
                                 TimeUnit.MILLISECONDS.sleep(750);
                                 Object obj=in.readObject();
-                                if(obj instanceof Move) {
-                                        Move move=(Move)obj;
-                                        game.setData(move.x, move.y, move.fishka);
+
+                                if(obj instanceof Player) {
+                                        Player player=(Player)obj;
+                                        game.setNewPlayerInfo(player);
                                 }
-                                else {
+                                else if(obj instanceof NewGame){
                                         NewGame newGame=(NewGame)obj;
                                         game.restartGame(newGame.firstMove);
+                                }
+                                else {
+                                        Move move=(Move)obj;
+                                        game.setData(move.x, move.y, move.fishka);
                                 }
                         }
                         

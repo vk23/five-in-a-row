@@ -16,7 +16,7 @@ import javax.swing.ImageIcon;
  */
 
 //Интерфейс, описывающий абстрактную фишку и ее методы
-public interface Fishka {
+public interface Fishka extends Serializable{
         /**Получить значение фишки(1 или -1), для занесения в таблицу значений
          * @return 1,-1.
          */
@@ -28,9 +28,9 @@ public interface Fishka {
 }
 
 //Класс, описывающий белые фишки(крестики).
-class White implements Fishka, Serializable{
+class White implements Fishka {
         private int i=1;
-        private ImageIcon icon=new ImageIcon(Starter.class.getResource("resources/cross.png"));
+        private ImageIcon icon=new ImageIcon(Starter.class.getResource("resources/null.png"));
         public int get() {
                 return i;
         }
@@ -39,9 +39,9 @@ class White implements Fishka, Serializable{
         }
 }
 //Класс, описывающий черные фишки(нолики).
-class Black implements Fishka,Serializable {
+class Black implements Fishka {
         private int i=-1;
-        private ImageIcon icon=new ImageIcon(Starter.class.getResource("resources/null.png"));
+        private ImageIcon icon=new ImageIcon(Starter.class.getResource("resources/cross.png"));
         public int get() {
                 return i;
         }

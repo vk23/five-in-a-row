@@ -28,40 +28,55 @@ public class GameFrame extends JFrame {
         private Sender sender;
         private boolean moveDone=false;
         private int lastIndex;
-        private Color defaultCellColor=Helper.DEFAULT_COLOR;
-        //private boolean gameEnded=false;
+        private Color defaultCellColor=Helper.DEFAULT_COLOR;       
         private JMenuBar menuBar;
         private InfoPanel infoPanel;
         private JPanel cellPanel;
+        private Player player;
+        private Player opponent;
         
-        /**Конструктор игрового поля для хоста
-         *
-         * @param f объект-фишка.
+        /**Конструктор игрового поля для хоста        
+         * @param player объект-игрок.
          * @throws java.io.IOException
          */
-        public GameFrame(Fishka f) throws IOException {
+        public GameFrame(Player player) throws IOException {
                 super("Крестики-нолики");
-                fishka=f;                
+                this.player=player;                
                 initGame(true);
                 sender=new Host(this);
                 moveDone=true;  //Первым ходит хост.
         }
 
         /**Конструктор игрового поля для клиента
-         * @param f обьект-фишка.
+         * @param player обьект-игрок.
          * @param addr IP адрес хоста.
          * @throws java.io.IOException
          */
-        public GameFrame(Fishka f,String addr) throws IOException {
+        public GameFrame(Player player, String addr) throws IOException {
                 super("Крестики-нолики");
-                fishka=f;
+                this.player=player;
                 initGame(false);
                 sender=new Client(this,addr);                
+        }
+
+        public void setNewPlayerInfo(Player newPLayer) {
+                opponent=newPLayer;
+                infoPanel.setPlayersInfo(player,opponent);
+                System.out.println(opponent.getName());
+        }
+        /**
+         * Возвращает ссылку на игрока владельца поля.
+         * @return
+         */
+        public Player getPlayer() {
+                return player;
         }
 
         //Инициализация компонентов.
         private void initGame(boolean disableButtons) {
                 System.out.println("Создается фрейм игры");
+
+                fishka=player.getFishka();
                 
                 setVisible(true);
                 setLocation(Helper.START_LOCATION);
@@ -89,12 +104,12 @@ public class GameFrame extends JFrame {
                 addWindowListener(new WindowAdapter() {
                         public void windowClosing(WindowEvent we) {
                                 //Выводим значение из массива данных (для отладки.)
-                                for(int i=0;i<DIM;i++) {
-                                        for(int j=0;j<DIM;j++) {
-                                                System.out.print(data[i][j]);
-                                        }
-                                        System.out.println("");
-                                }
+//                                for(int i=0;i<DIM;i++) {
+//                                        for(int j=0;j<DIM;j++) {
+//                                                System.out.print(data[i][j]);
+//                                        }
+//                                        System.out.println("");
+//                                }
                                 //Выход из программы.
                                 System.exit(0); 
                         }
@@ -103,6 +118,9 @@ public class GameFrame extends JFrame {
         }
 
         /**Установка данных по-умолчанию(из сети). Смотри setData(int row,int col, Fishka fishka,boolean fromNet);
+         * @param row х координата клетки.
+         * @param col у координата клетки.
+         * @param fishka объект, указывающий какая фишка должна быть установлена в данной клетке.
          */
         public void setData(int row,int col,Fishka fishka) {                
                 moveDone=true;                  //Ход противника совершен, игрок может ходить.
@@ -147,13 +165,8 @@ public class GameFrame extends JFrame {
                 infoPanel.setInfoLabel(text);
         }
 
-        //Возвращаем массив значений.
-        public int[][] getData() {
-                return data;
-        }
-
         //Завершение игры
-        private void endGame(int[] winRow,int fishka) {
+        private void endGame(int[] winRow,int fishkaID) {
                 //Делаем все кнопки неактивными.
                 for(Cell cell:cells) {
                         cell.setEnabled(false);                        
@@ -163,8 +176,20 @@ public class GameFrame extends JFrame {
                         int index=winRow[i]*DIM+winRow[i+1];
                         cells[index].setEnabled(true);
                         cells[index].setRolloverEnabled(false); 
-                }                
-                infoPanel.setInfoLabel("The End. Winner: "+fishka);
+                }
+                
+                //Устанавливаем победителя, добавляем ему очко и выводим информацию.
+                String winner;
+                if(fishkaID==player.getFishka().get()) {
+                        player.increaseWinCounter();
+                        winner=player.getName();
+                }
+                else {
+                        opponent.increaseWinCounter();
+                        winner=opponent.getName();
+                }
+                infoPanel.setInfoLabel("Winner: "+winner);
+                infoPanel.setPlayersInfo(player, opponent);
         }
         /**Чтобы ждать хода противника устанавливаем значение переменной в ложь.
          */
@@ -199,13 +224,13 @@ public class GameFrame extends JFrame {
         }
         /**Начинаем игру(делаем кнопки активными).
          */
-        public void fillCellArray() {
+        public void enableCells() {
                 for(Cell cell:cells) {
                         cell.setEnabled(true);                        
                 }
         }
         /**
-         * Перезапуск игры. Розыгрыш первого хода. Перезаполнение игрового поля. Отправка данных по сети.
+         * Перезапуск игры(владельцем поля). Розыгрыш первого хода. Перезаполнение игрового поля. Отправка данных по сети.
          * @throws java.io.IOException
          */
         public void restartGame() throws IOException {
@@ -245,13 +270,12 @@ public class GameFrame extends JFrame {
                 cellPanel.removeAll();
                 fillTheField(false);
                 cellPanel.validate();
+                
                 //Создаем новый массив значений.
                 data=new int[DIM][DIM];
 
-//                setNewGameStarted();
-                System.out.println("new game started");
                 //Чей первый ход.
-                String moveText=(moveDone ? "Ваш ход" : "Ходит ваш оппонент");
+                String moveText=(moveDone ? player.getName() : opponent.getName());
                 infoPanel.setInfoLabel("Розыгрыш первого хода: "+moveText);
         }
 }

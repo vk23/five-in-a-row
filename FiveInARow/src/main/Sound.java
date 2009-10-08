@@ -31,32 +31,45 @@ public class Sound {
         public Sound(GameFrame game, JMenuItem soundMenu) {
                 this.game=game;
                 sndMenu=soundMenu;
+                
+                        //Получаем секвенсер
+                try{
+                        sequencer=MidiSystem.getSequencer(true);                        
+                        System.out.println("true");
+                } catch(MidiUnavailableException ex) {
+                        try {
+                                sequencer=MidiSystem.getSequencer(false);                                
+                                System.out.println("false");
+                        }
+                        catch (MidiUnavailableException exc) {
+                                //throw new RuntimeException(exc);
+                                System.out.println(exc);
+                        }
+                }
+                
                 try{                        
-                        //Получаем секвенсер и трансмиттер для него
-                        sequencer=MidiSystem.getSequencer(false);
+                        //Получаем трансмиттер для сиквенсера.
                         Transmitter transmitter=sequencer.getTransmitter();
                         
                         //Получаем синтезатор и его ресивер.
                         Synthesizer synthesizer=MidiSystem.getSynthesizer();
-                        Receiver receiver=synthesizer.getReceiver();
-
+                        Receiver receiver=synthesizer.getReceiver();                        
+                        
                         //Соединяем трансмиттер с ресивером.
-                        transmitter.setReceiver(receiver);
-
-                        //Открываем оба устройства.
+                        transmitter.setReceiver(receiver);                        
+                                                
                         sequencer.open();
                         synthesizer.open();
-                        System.out.println("devices connected");
                         
                         //Загружаем миди-файл в секвенсер, ставим бесконечный повтор.
-                        URL song=Starter.class.getResource("resources/song1.mid");                        
-                        File file=new File("/media/kaligula/DownLoad/song1.mid");                        
+                        URL song=Starter.class.getResource("resources/song1.mid");
+                        File file=new File("/media/kaligula/DownLoad/song1_3instr.mid");
                         Sequence sequence=MidiSystem.getSequence(song);
                         sequencer.setSequence(sequence);
-                        sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY);
+                        sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY);                                            
                         
                 } catch (MidiUnavailableException e) {
-                        new Error(game, "Sound device is busy");
+                        new Error(game, "MIDI device is unavailable");
                         sndMenu.setSelected(false); 
                 } catch (InvalidMidiDataException ex) {
                         System.out.println(ex);
@@ -68,6 +81,9 @@ public class Sound {
                 }
         }
 
+        public boolean isRunning() {
+                return sequencer.isRunning();
+        }
         public void startPlayback() {
                 sequencer.start();
         }

@@ -25,7 +25,7 @@ public class Starter extends JFrame implements ActionListener{
         private JButton ok,exit;
         private JRadioButton yes,no;
         private ButtonGroup choice;
-        private JTextField ip_addr;
+        private JTextField IPAddress,playerName;
         private boolean joinToHost=false;
         
         private Starter() {
@@ -72,15 +72,30 @@ public class Starter extends JFrame implements ActionListener{
                 choice.add(no);
 
                 //Поле ввода IP-адреса.
-                ip_addr=new JTextField("127.0.0.1");
-                ip_addr.setForeground(Color.GRAY);
+                IPAddress=new JTextField("127.0.0.1");
+                IPAddress.setForeground(Color.GRAY);
+                IPAddress.setHorizontalAlignment(JTextField.RIGHT);
 
-                //Панель, на которой будут размещены переключатели и поле ввода.
-                JPanel radioPanel=new JPanel(new GridLayout(2,2));
-                radioPanel.add(yes);
-                radioPanel.add(new JPanel());
-                radioPanel.add(no);
-                radioPanel.add(ip_addr);
+                //Предложение ввести имя игрока.
+                JLabel nameLabel=new JLabel("Enter your name:");
+                nameLabel.setFont(Helper.SMALL_FONT);
+                nameLabel.setHorizontalAlignment(JLabel.RIGHT);
+
+                //Поле ввода для ввода имени игрока.
+                playerName=new JTextField("Unnamed");
+                playerName.setHorizontalAlignment(JTextField.RIGHT);
+                playerName.setForeground(Color.GRAY);
+                
+                //Основная панель, на которой будут размещены компоненты.
+                JPanel centerPanel=new JPanel(new GridLayout(4,2));
+                centerPanel.add(yes);
+                centerPanel.add(new JPanel());
+                centerPanel.add(no);                
+                centerPanel.add(IPAddress);
+                centerPanel.add(new JPanel());
+                centerPanel.add(new JPanel());
+                centerPanel.add(nameLabel);
+                centerPanel.add(playerName);
 
                 //Кнопка запуска программы.
                 ok=new JButton("OK");
@@ -110,12 +125,13 @@ public class Starter extends JFrame implements ActionListener{
                 //Панель кнопок.
                 JPanel buttonPanel=new JPanel(new FlowLayout());
                 buttonPanel.add(ok);
-                buttonPanel.add(exit);
-                
+                buttonPanel.add(exit);                
+               
                 //Добавляем вопрос и панели на фрейм.
                 add(question,BorderLayout.NORTH);
-                add(radioPanel,BorderLayout.CENTER);
+                add(centerPanel,BorderLayout.CENTER);
                 add(buttonPanel,BorderLayout.SOUTH);
+                
         }
         /**
          *
@@ -151,19 +167,23 @@ public class Starter extends JFrame implements ActionListener{
                 //Скрываем стартовое окно.
                 this.dispose();
                 //Получаем введеный IP-адрес.
-                String address=ip_addr.getText().trim();                
+                String address=IPAddress.getText().trim();
                 Fishka f;
-                //Создаем поле с белыми фишками(крестики) и присоединияемся к игре.
+                Player player;
+                String name=playerName.getText().trim();
+                //Присоединияемся к игре.
                 if(joinToHost) {
                         System.out.println("Connecting to "+address);                        
                         f=new White();
-                        GameFrame gf=new GameFrame(f,address);
+                        player=new Player(name, f);
+                        GameFrame gf=new GameFrame(player,address);
                 }
-                //Создаем поле с черными фишками(нолики) и создаем новую игру.
+                //Создаем новую игру.
                 else {
                         System.out.println("Creating new game");                        
                         f=new Black();
-                        GameFrame gf=new GameFrame(f);
+                        player=new Player(name, f);
+                        GameFrame gf=new GameFrame(player);
                 }                
         }
 }

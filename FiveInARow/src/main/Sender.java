@@ -24,4 +24,6 @@ interface Sender {
          * @throws java.io.IOException
          */
         public void sendNewGame(NewGame newGame) throws IOException;
+
+        public void sendNewPlayerInfo(Player player) throws IOException;
 }

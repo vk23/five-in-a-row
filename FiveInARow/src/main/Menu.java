@@ -5,7 +5,6 @@
 
 package main;
 
-import java.awt.ItemSelectable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -90,7 +89,9 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
                                 }                        
                 }                
         }
-
+        /**Обработка событий чекбоксов.
+         * @param e событие
+         */
         public void itemStateChanged(ItemEvent e) {
                 int state=e.getStateChange();
                 Object menuItem=e.getItem();
@@ -100,8 +101,9 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
                                 sound.startPlayback();
                         }
                         else {
-                                
-                                sound.stopPlayback();
+                                if(sound!=null && sound.isRunning()) {
+                                        sound.stopPlayback();
+                                }
                         }
                 }
         }
