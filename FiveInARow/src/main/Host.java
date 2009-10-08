@@ -20,6 +20,7 @@ public class Host implements Sender,Runnable{
         private ServerSocket server;
         private Socket socket;
         private ObjectOutputStream out;
+        private ObjectInputStream in;
         private GameFrame game;
         
         /**
@@ -58,7 +59,7 @@ public class Host implements Sender,Runnable{
 
                         //Создаем потоки, связанные с сокетом.
                         out=new ObjectOutputStream(socket.getOutputStream());
-                        ObjectInputStream in=new ObjectInputStream(socket.getInputStream());
+                        in=new ObjectInputStream(socket.getInputStream());
 
                         //Делаем клетки активными, т.к. подключился клиент
                         game.fillCellArray();
@@ -85,6 +86,14 @@ public class Host implements Sender,Runnable{
                         new Error(game, ex.toString());
                 } catch (ClassCastException ex) {
                         new Error(game, ex.toString());
+                } finally {
+                        try{
+                                out.close();
+                                in.close();
+                        }
+                        catch(IOException ex) {
+                        }
                 }
+
         }        
 }

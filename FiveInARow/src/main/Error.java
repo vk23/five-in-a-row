@@ -54,6 +54,6 @@ public class Error extends JDialog implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
                 this.dispose();
-                System.exit(1);
+//                System.exit(1);
         }
 }

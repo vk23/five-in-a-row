@@ -5,11 +5,13 @@
 
 package main;
 
+import java.awt.ItemSelectable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -18,10 +20,11 @@ import javax.swing.JMenuItem;
  *Создает панель меню.
  * @author kaligula
  */
-public class Menu extends JMenuBar implements ActionListener{
+public class Menu extends JMenuBar implements ActionListener,ItemListener{
         private GameFrame gameFrame;
         private JMenu mainMenu,helpMenu;
-        private JMenuItem start, sound,exit,help,about;
+        private JMenuItem start, soundMenu,exit,help,about;
+        private Sound sound;
         /**
          * Создает панель меню.
          * @param gameFrame ссылка на игровое поле.
@@ -33,9 +36,8 @@ public class Menu extends JMenuBar implements ActionListener{
         }
         //Инициализация элементов меню.
         private void initMenu() {
-                setFont(Helper.SMALL_FONT);
+                setFont(Helper.SMALL_FONT);                
                 //Создаем главное меню.
-
                 mainMenu=new JMenu("Main");                
                 add(mainMenu);
                 //Создаем меню помощи.
@@ -44,21 +46,24 @@ public class Menu extends JMenuBar implements ActionListener{
 
                 //Создаем элементы меню.
                 start=new JMenuItem("New game");
-                sound=new JMenuItem("Sound");
+                soundMenu=new JCheckBoxMenuItem("Sound");
                 exit=new JMenuItem("Exit");
                 about=new JMenuItem("About");
                 help=new JMenuItem("Help");
 
                 //Вешаем на них лисенеры.
                 start.addActionListener(this);
-                sound.addActionListener(this);
+                soundMenu.addActionListener(this);
+                soundMenu.addItemListener(this);
                 exit.addActionListener(this);
                 about.addActionListener(this);
                 help.addActionListener(this);
 
+                //Настраиваем элементы меню.
+                
                 //Добавляем элементы в меню.
                 mainMenu.add(start);
-                mainMenu.add(sound);
+                mainMenu.add(soundMenu);
                 mainMenu.addSeparator();
                 mainMenu.add(exit);                
                 helpMenu.add(help);
@@ -77,12 +82,27 @@ public class Menu extends JMenuBar implements ActionListener{
                         System.exit(0);
                 }
                 //Перезапуск игры.
-                if(action.equalsIgnoreCase("new game")) {                        
+                else if(action.equalsIgnoreCase("new game")) {
                                 try {
                                         gameFrame.restartGame();
                                 } catch (IOException ex) {
                                         new Error(this.gameFrame,"IOException within restartGame()");
                                 }                        
+                }                
+        }
+
+        public void itemStateChanged(ItemEvent e) {
+                int state=e.getStateChange();
+                Object menuItem=e.getItem();
+                if(menuItem.equals(soundMenu)) {
+                        if(state==ItemEvent.SELECTED) {
+                                sound=new Sound(gameFrame, soundMenu); 
+                                sound.startPlayback();
+                        }
+                        else {
+                                
+                                sound.stopPlayback();
+                        }
                 }
         }
 }
