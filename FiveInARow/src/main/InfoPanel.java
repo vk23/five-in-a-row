@@ -30,10 +30,18 @@ public class InfoPanel extends JPanel{
                 information.setFont(Helper.SMALL_FONT);
                 add(information,BorderLayout.EAST);
         }
+        /**
+         * Устанавливает текст в информационное поле.
+         * @param text
+         */
         public void setInfoLabel(String text) {
                 information.setText(text); 
         }
-
+        /**
+         * Устанавливает информацию об игроках и счет игры.
+         * @param player1 игрок, владелец поля.
+         * @param player2 игрок-опонент.
+         */
         public void setPlayersInfo(Player player1,Player player2) {
                 players.setText(player1.getName()+" vs "+player2.getName()+" "+player1.getWins()+":"+player2.getWins());
         }

@@ -28,6 +28,12 @@ public class Sound {
         private Sequencer sequencer;
         private GameFrame game;
         private JMenuItem sndMenu;
+
+        /**
+         * Конструктор для создания звукового объекта.
+         * @param game ссылка на игровое поле.
+         * @param soundMenu ссылка на элемент меню sound.
+         */
         public Sound(GameFrame game, JMenuItem soundMenu) {
                 this.game=game;
                 sndMenu=soundMenu;
@@ -80,13 +86,22 @@ public class Sound {
                         System.exit(1); 
                 }
         }
-
+        /**
+         * Проверяет играет ли мелодия.
+         * @return Возвращает true если мелодия играет.
+         */
         public boolean isRunning() {
                 return sequencer.isRunning();
         }
+        /**
+         *Запускает проигрывание мелодии.
+         */
         public void startPlayback() {
                 sequencer.start();
         }
+        /**
+         * Останавливает проигрывание.
+         */
         public void stopPlayback() {
                 sequencer.stop();
         }

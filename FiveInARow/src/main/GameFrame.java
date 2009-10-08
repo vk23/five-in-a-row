@@ -43,7 +43,7 @@ public class GameFrame extends JFrame {
                 super("Крестики-нолики");
                 this.player=player;                
                 initGame(true);
-                sender=new Host(this);
+                sender=new Transporter(this);
                 moveDone=true;  //Первым ходит хост.
         }
 
@@ -56,7 +56,7 @@ public class GameFrame extends JFrame {
                 super("Крестики-нолики");
                 this.player=player;
                 initGame(false);
-                sender=new Client(this,addr);                
+                sender=new Transporter(this,addr);
         }
 
         public void setNewPlayerInfo(Player newPLayer) {

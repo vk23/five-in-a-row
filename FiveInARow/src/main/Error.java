@@ -28,6 +28,8 @@ public class Error extends JDialog implements ActionListener{
          */
         public Error(JFrame game,String error) {
                 super(game,"Oops!");
+
+                //Настраиваем диалоговое окно.
                 Point p=Helper.START_LOCATION;
                 setLocation(new Point(p.x+150,p.y+200));                
                 setLayout(new GridLayout(2,1));

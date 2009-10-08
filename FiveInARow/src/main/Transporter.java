@@ -8,50 +8,67 @@ package main;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
+ *Класс-поток хоста. Создает сервер-сокет и общается по сети.
  * @author kaligula
  */
-public class Client implements Sender,Runnable{
+public class Transporter implements Sender,Runnable{
+        private ServerSocket server;
         private Socket socket;
-        private String ip_str;
-        private GameFrame game;
         private ObjectOutputStream out;
+        private ObjectInputStream in;
+        private GameFrame game;
+        
         /**
-         * Конструктор клиентского потока.
-         * @param gf ссылка на игровое поле, принадлежащее клиенту.
-         * @param ip_str IP адрес хоста.
+         * Конструктор серверного потока.
+         * @param gf ссылка на игровое поле хоста.
+         * @throws java.io.IOException
          */
-        public Client(GameFrame gf,String ip_str)  {
+        public Transporter(GameFrame gf) throws IOException  {
                 game=gf;
-                this.ip_str=ip_str;
+                server = new ServerSocket(Helper.PORT);
+                socket=server.accept();
                 new Thread(this).start();
         }
-        
-        /**Отправка данных по сети.
-         *
-         * @param move сериализованный объект, содержащий информацию о совершенном ходе.
+        /**
+         * Конструктор клиентского потока.
+         * @param gf ссылка на игровое поле клиента.
+         * @param ipAdr IP адрес хоста.
+         * @throws java.net.UnknownHostException
          * @throws java.io.IOException
          */
+        public Transporter(GameFrame gf,String ipAdr) throws UnknownHostException, IOException {
+                game=gf;
+                InetAddress ip=InetAddress.getByName(ipAdr);
+                socket=new Socket(ip,Helper.PORT);
+                new Thread(this).start();
+        }
+
+        /**
+        *Отправка данных по сети, после клика на клетке.
+        */
         public void sendData(Move move) throws IOException {
-                out.writeObject(move);
-                out.flush();                
+                //Сериализация и запись объекта в сетевой поток.
+                out.writeObject(move); 
+                out.flush();                 
+                System.out.println("Object written");
         }
         /**
-         * Отправка данных о начале новой игры.
-         * @param newGame объект, содержащий информацию о новой игре.
+         * Отправка данных по сети для создания новой игры.
+         * @param newGame
          * @throws java.io.IOException
          */
-        public void sendNewGame(NewGame newGame) throws IOException {                
+        public void sendNewGame(NewGame newGame) throws IOException {               
                 //Сериализация и запись объекта в сетевой поток.
                 out.writeObject(newGame);
                 out.flush();
-                System.out.println("Client:Object written");
+                System.out.println("Object written");
         }
         /**
          * Посылает информацию об игроке.
@@ -64,16 +81,15 @@ public class Client implements Sender,Runnable{
                 out.flush();
                 System.out.println("Client:Object written");
         }
-
+        
         public void run() {
-                try {
-                        InetAddress ip=Inet4Address.getByName(ip_str);
-                        socket=new Socket(ip,Helper.PORT);
-                        
+                try {                       
                         //Создаем потоки, связанные с сокетом.
                         out=new ObjectOutputStream(socket.getOutputStream());
-                        ObjectInputStream in=new ObjectInputStream(socket.getInputStream());
+                        in=new ObjectInputStream(socket.getInputStream());
 
+                        //Делаем клетки активными, т.к. подключился клиент
+                        game.enableCells();
                         //Отсылаем данные об игроке.
                         sendNewPlayerInfo(game.getPlayer());
                         
@@ -81,7 +97,7 @@ public class Client implements Sender,Runnable{
                         while(true) {
                                 TimeUnit.MILLISECONDS.sleep(750);
                                 Object obj=in.readObject();
-                                
+
                                 if(obj instanceof Player) {
                                         Player player=(Player)obj;
                                         game.setNewPlayerInfo(player);
@@ -95,7 +111,7 @@ public class Client implements Sender,Runnable{
                                         game.setData(move.x, move.y, move.fishka);
                                 }
                         }
-
+                        
                 } catch (IOException ex) {
                         new Error(game, "Connection problem");
                 } catch (InterruptedException ex) {
@@ -104,6 +120,14 @@ public class Client implements Sender,Runnable{
                         new Error(game, ex.toString());
                 } catch (ClassCastException ex) {
                         new Error(game, ex.toString());
+                } finally {
+                        try{
+                                out.close();
+                                in.close();
+                        }
+                        catch(IOException ex) {
+                        }
                 }
-        }
+
+        }        
 }
