@@ -170,19 +170,21 @@ public class Starter extends JFrame implements ActionListener{
                 String address=IPAddress.getText().trim();
                 Fishka f;
                 Player player;
-                String name=playerName.getText().trim();
+                String name=playerName.getText().trim();                
                 //Присоединияемся к игре.
                 if(joinToHost) {
                         System.out.println("Connecting to "+address);                        
                         f=new White();
-                        player=new Player(name, f);
+                        player=Helper.identifyPlayer(name,f);
+                        if(player==null)player=new Player(name, f);
                         GameFrame gf=new GameFrame(player,address);
                 }
                 //Создаем новую игру.
                 else {
                         System.out.println("Creating new game");                        
                         f=new Black();
-                        player=new Player(name, f);
+                        player=Helper.identifyPlayer(name,f);
+                        if(player==null)player=new Player(name, f);
                         GameFrame gf=new GameFrame(player);
                 }                
         }

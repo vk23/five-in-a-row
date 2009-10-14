@@ -104,14 +104,7 @@ public class GameFrame extends JFrame {
                 //Добавляем прослушивание закрытия окна - завершение работы программы.
                 addWindowListener(new WindowAdapter() {
                         public void windowClosing(WindowEvent we) {
-                                //Выводим значение из массива данных (для отладки.)
-//                                for(int i=0;i<DIM;i++) {
-//                                        for(int j=0;j<DIM;j++) {
-//                                                System.out.print(data[i][j]);
-//                                        }
-//                                        System.out.println("");
-//                                }
-                                //Выход из программы.
+                                saveAndExit();
                                 System.exit(0); 
                         }
                 });
@@ -278,5 +271,12 @@ public class GameFrame extends JFrame {
                 //Чей первый ход.
                 String moveText=(moveDone ? player.getName() : opponent.getName());
                 infoPanel.setInfoLabel("Розыгрыш первого хода: "+moveText);
+        }
+        /**
+         * Сохраняет результат текущего игрока и завершает программу.
+         */
+        public void saveAndExit() {
+                Helper.saveRecords(player);
+                System.exit(0); 
         }
 }

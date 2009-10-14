@@ -78,7 +78,7 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
                 String action=e.getActionCommand();
                 //Выход из программы.
                 if(action.equalsIgnoreCase("exit")) {
-                        System.exit(0);
+                        gameFrame.saveAndExit();
                 }
                 //Перезапуск игры.
                 else if(action.equalsIgnoreCase("new game")) {
