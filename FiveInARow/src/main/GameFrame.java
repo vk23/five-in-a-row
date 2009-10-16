@@ -166,8 +166,11 @@ public class GameFrame extends JFrame {
          * Сохраняет результат текущего игрока и завершает программу.
          */
         public void saveAndExit() {
-                Helper.saveLastPlayerName(player.getName());
-                Helper.saveRecords(player,opponent);
+                try {
+                        Helper.saveLastPlayerName(player.getName());
+                        Helper.saveRecords(player, opponent);
+                } catch (Exception e) {
+                }
                 System.exit(0);
         }
 

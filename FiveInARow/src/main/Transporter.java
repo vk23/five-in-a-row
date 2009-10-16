@@ -117,19 +117,18 @@ public class Transporter implements Sender,Runnable{
                         }
                         
                 } catch (IOException ex) {
-                        new Error(game, "Connection problem");
+                        new Error( "Connection problem");
                 } catch (InterruptedException ex) {
-                        new Error(game, ex.toString());
+                        new Error( ex.toString());
                 } catch (ClassNotFoundException ex) {
-                        new Error(game, ex.toString());
+                        new Error( ex.toString());
                 } catch (ClassCastException ex) {
-                        new Error(game, ex.toString());
-                } finally {
-                        try{
-                                out.close();
-                                in.close();
-                        }
-                        catch(IOException ex) {
+                        new Error( ex.toString());
+                } finally {                        
+                                try {
+                                        out.close();
+                                        in.close();
+                                } catch (IOException ex) {                               
                         }
                 }
 

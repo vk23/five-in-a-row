@@ -26,8 +26,8 @@ public class Error extends JDialog implements ActionListener{
          * @param game фрейм являющийся владельцем данного диалого.
          * @param error информация об ошибке.
          */
-        public Error(JFrame game,String error) {
-                super(game,"Oops!");
+        public Error(String error) {
+                super();
 
                 //Настраиваем диалоговое окно.
                 Point p=Helper.START_LOCATION;

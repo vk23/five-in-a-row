@@ -85,7 +85,7 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
                                 try {
                                         gameFrame.restartGame();
                                 } catch (IOException ex) {
-                                        new Error(this.gameFrame,"IOException within restartGame()");
+                                        new Error("IOException within restartGame()");
                                 }                        
                 }                
         }

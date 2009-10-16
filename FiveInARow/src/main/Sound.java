@@ -75,7 +75,7 @@ public class Sound {
                         sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY);                                            
                         
                 } catch (MidiUnavailableException e) {
-                        new Error(game, "MIDI device is unavailable");
+                        new Error( "MIDI device is unavailable");
                         sndMenu.setSelected(false); 
                 } catch (InvalidMidiDataException ex) {
                         System.out.println(ex);
