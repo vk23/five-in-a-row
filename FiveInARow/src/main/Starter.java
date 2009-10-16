@@ -82,7 +82,8 @@ public class Starter extends JFrame implements ActionListener{
                 nameLabel.setHorizontalAlignment(JLabel.RIGHT);
 
                 //Поле ввода для ввода имени игрока.
-                playerName=new JTextField("Unnamed");
+                playerName=new JTextField();
+                playerName.setText(Helper.restoreLastPlayerName());
                 playerName.setHorizontalAlignment(JTextField.RIGHT);
                 playerName.setForeground(Color.GRAY);
                 
@@ -176,7 +177,9 @@ public class Starter extends JFrame implements ActionListener{
                         System.out.println("Connecting to "+address);                        
                         f=new White();
                         player=Helper.identifyPlayer(name,f);
-                        if(player==null)player=new Player(name, f);
+                        if(player==null) {
+                                player = new Player(name, f);
+                        }
                         GameFrame gf=new GameFrame(player,address);
                 }
                 //Создаем новую игру.
@@ -184,7 +187,9 @@ public class Starter extends JFrame implements ActionListener{
                         System.out.println("Creating new game");                        
                         f=new Black();
                         player=Helper.identifyPlayer(name,f);
-                        if(player==null)player=new Player(name, f);
+                        if(player==null) {
+                                player = new Player(name, f);
+                        }
                         GameFrame gf=new GameFrame(player);
                 }                
         }
