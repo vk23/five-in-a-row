@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
@@ -26,17 +25,17 @@ import javax.swing.JMenuItem;
  */
 public class Sound {
         private Sequencer sequencer;
-        private GameFrame game;
+        private Synthesizer synthesizer;        
         private JMenuItem sndMenu;
+        private String songName;
 
         /**
          * Конструктор для создания звукового объекта.
          * @param game ссылка на игровое поле.
          * @param soundMenu ссылка на элемент меню sound.
          */
-        public Sound(GameFrame game, JMenuItem soundMenu) {
-                this.game=game;
-                sndMenu=soundMenu;
+        public Sound(String songName) {
+                this.songName=songName;
                 
                         //Получаем секвенсер
                 try{
@@ -58,7 +57,7 @@ public class Sound {
                         Transmitter transmitter=sequencer.getTransmitter();
                         
                         //Получаем синтезатор и его ресивер.
-                        Synthesizer synthesizer=MidiSystem.getSynthesizer();
+                        synthesizer=MidiSystem.getSynthesizer();
                         Receiver receiver=synthesizer.getReceiver();                        
                         
                         //Соединяем трансмиттер с ресивером.
@@ -68,8 +67,8 @@ public class Sound {
                         synthesizer.open();
                         
                         //Загружаем миди-файл в секвенсер, ставим бесконечный повтор.
-                        URL song=Starter.class.getResource("resources/song1.mid");
-                        File file=new File("/media/kaligula/DownLoad/song1_3instr.mid");
+                        URL song=Starter.class.getResource("resources/"+songName+".mid");
+//                        File file=new File("/media/kaligula/DownLoad/song1_3instr.mid");
                         Sequence sequence=MidiSystem.getSequence(song);
                         sequencer.setSequence(sequence);
                         sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY);                                            
@@ -104,5 +103,7 @@ public class Sound {
          */
         public void stopPlayback() {
                 sequencer.stop();
+                sequencer.close();
+                synthesizer.close();
         }
 }

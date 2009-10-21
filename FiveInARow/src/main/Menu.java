@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -21,8 +22,8 @@ import javax.swing.JMenuItem;
  */
 public class Menu extends JMenuBar implements ActionListener,ItemListener{
         private GameFrame gameFrame;
-        private JMenu mainMenu,helpMenu;
-        private JMenuItem start, soundMenu,exit,help,about;
+        private JMenu mainMenu,helpMenu, soundMenu;
+        private JMenuItem start,exit,help,about, song1, song2,songoff;
         private Sound sound;
         /**
          * Создает панель меню.
@@ -42,25 +43,40 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
                 //Создаем меню помощи.
                 helpMenu=new JMenu("Help");
                 add(helpMenu);
+                //Создаем меню звука.
+                soundMenu=new JMenu("Sound");
 
                 //Создаем элементы меню.
-                start=new JMenuItem("New game");
-                soundMenu=new JCheckBoxMenuItem("Sound");
+                start=new JMenuItem("New game");                
                 exit=new JMenuItem("Exit");
                 about=new JMenuItem("About");
                 help=new JMenuItem("Help");
-
+                song1=new JCheckBoxMenuItem("Memory Remains");
+                song1.setName("song1");
+                song2=new JCheckBoxMenuItem("Memory Remains 2");
+                song2.setName("song2");
+                songoff=new JCheckBoxMenuItem("Off");
+                songoff.setName("Off");
+                
+                //Создаем группу чекбоксов.
+                ButtonGroup group=new ButtonGroup();
+                group.add(songoff);
+                group.add(song1);
+                group.add(song2);
+                
                 //Вешаем на них лисенеры.
                 start.addActionListener(this);
-                soundMenu.addActionListener(this);
-                soundMenu.addItemListener(this);
                 exit.addActionListener(this);
                 about.addActionListener(this);
                 help.addActionListener(this);
-
-                //Настраиваем элементы меню.
+                song1.addItemListener(this);
+                song2.addItemListener(this);
+                songoff.addItemListener(this);
                 
                 //Добавляем элементы в меню.
+                soundMenu.add(songoff);
+                soundMenu.add(song1);
+                soundMenu.add(song2);
                 mainMenu.add(start);
                 mainMenu.add(soundMenu);
                 mainMenu.addSeparator();
@@ -77,34 +93,39 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
                 //Название произошедшего события.
                 String action=e.getActionCommand();
                 //Выход из программы.
-                if(action.equalsIgnoreCase("exit")) {
+                if(action.equals("Exit")) {
                         gameFrame.saveAndExit();
                 }
                 //Перезапуск игры.
-                else if(action.equalsIgnoreCase("new game")) {
+                else if(action.equals("New game")) {
                                 try {
                                         gameFrame.restartGame();
                                 } catch (IOException ex) {
                                         new Error("IOException within restartGame()");
                                 }                        
-                }                
+                }
+                else if(action.equals("About")) {
+                        System.out.println("About");                        
+                }
+                else if(action.equals("Help")) {
+                        System.out.println("Help");
+                }
         }
         /**Обработка событий чекбоксов.
          * @param e событие
          */
         public void itemStateChanged(ItemEvent e) {
-                int state=e.getStateChange();
-                Object menuItem=e.getItem();
-                if(menuItem.equals(soundMenu)) {
-                        if(state==ItemEvent.SELECTED) {
-                                sound=new Sound(gameFrame, soundMenu); 
-                                sound.startPlayback();
-                        }
-                        else {
-                                if(sound!=null && sound.isRunning()) {
-                                        sound.stopPlayback();
-                                }
-                        }
+                if(sound!=null) {
+                        sound.stopPlayback();
+                        sound=null;
                 }
+
+                JCheckBoxMenuItem obj=(JCheckBoxMenuItem)e.getItem();
+                String selectedSong=obj.getName();
+
+                if(!selectedSong.equals("Off")) {
+                        sound=new Sound(selectedSong);
+                        sound.startPlayback();
+                }                
         }
 }
