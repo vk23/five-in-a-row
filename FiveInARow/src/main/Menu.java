@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
+import javax.sound.midi.MidiUnavailableException;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -25,6 +26,8 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
         private JMenu mainMenu,helpMenu, soundMenu;
         private JMenuItem start,exit,help,about, song1, song2,songoff;
         private Sound sound;
+        ButtonGroup group;
+        
         /**
          * Создает панель меню.
          * @param gameFrame ссылка на игровое поле.
@@ -59,7 +62,7 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
                 songoff.setName("Off");
                 
                 //Создаем группу чекбоксов.
-                ButtonGroup group=new ButtonGroup();
+                group=new ButtonGroup();
                 group.add(songoff);
                 group.add(song1);
                 group.add(song2);
@@ -125,7 +128,12 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
 
                 if(!selectedSong.equals("Off")) {
                         sound=new Sound(selectedSong);
-                        sound.startPlayback();
-                }                
+                        if(sound.isOK()) {
+                                sound.startPlayback();
+                        }
+                        else {                                
+                                group.clearSelection();
+                        }
+                }                 
         }
 }

@@ -1,7 +1,6 @@
 package main;
 
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import javax.sound.midi.InvalidMidiDataException;
@@ -12,7 +11,7 @@ import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.Synthesizer;
 import javax.sound.midi.Transmitter;
-import javax.swing.JMenuItem;
+import javax.swing.JCheckBoxMenuItem;
 
 /*
  * To change this template, choose Tools | Templates
@@ -25,14 +24,13 @@ import javax.swing.JMenuItem;
  */
 public class Sound {
         private Sequencer sequencer;
-        private Synthesizer synthesizer;        
-        private JMenuItem sndMenu;
+        private Synthesizer synthesizer;                
         private String songName;
-
+        private boolean ok=false;
+        
         /**
          * Конструктор для создания звукового объекта.
-         * @param game ссылка на игровое поле.
-         * @param soundMenu ссылка на элемент меню sound.
+         * @param songName название MIDI файла.
          */
         public Sound(String songName) {
                 this.songName=songName;
@@ -72,18 +70,18 @@ public class Sound {
                         Sequence sequence=MidiSystem.getSequence(song);
                         sequencer.setSequence(sequence);
                         sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY);                                            
-                        
+                        ok=true;
                 } catch (MidiUnavailableException e) {
+                        //sndMenu.s
                         new Error( "MIDI device is unavailable");
-                        sndMenu.setSelected(false); 
+                        
                 } catch (InvalidMidiDataException ex) {
                         System.out.println(ex);
                 } catch (IOException e) {
                         System.out.println(e);
                 } catch (NullPointerException e) {
                         System.out.println(e);
-                        System.exit(1); 
-                }
+                }                
         }
         /**
          * Проверяет играет ли мелодия.
@@ -105,5 +103,12 @@ public class Sound {
                 sequencer.stop();
                 sequencer.close();
                 synthesizer.close();
+        }
+        /**
+         * Проверяет статус готовности MIDI системы.
+         * @return возврашает true, если MIDI система готова к использованию.
+         */
+        public boolean isOK() {
+                return ok;
         }
 }
