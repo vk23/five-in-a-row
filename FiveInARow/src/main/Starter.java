@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package main;
 
@@ -175,21 +171,27 @@ public class Starter extends JFrame implements ActionListener{
                 //Присоединияемся к игре.
                 if(joinToHost) {
                         System.out.println("Connecting to "+address);                        
-                        f=new White();
-                        player=Helper.identifyPlayer(name,f);
+                        f=new Cross();
+                        player=Helper.identifyPlayer(name);
+                        player.setFishka(f);
+
                         if(player==null) {
                                 player = new Player(name, f);
-                        }
+                        }                                               
+
                         GameFrame gf=new GameFrame(player,address);
                 }
                 //Создаем новую игру.
                 else {
                         System.out.println("Creating new game");                        
-                        f=new Black();
-                        player=Helper.identifyPlayer(name,f);
+                        f=new Zero();
+                        player=Helper.identifyPlayer(name);
+                        player.setFishka(f);
+
                         if(player==null) {
                                 player = new Player(name, f);
-                        }
+                        }                        
+                        
                         GameFrame gf=new GameFrame(player);
                 }                
         }

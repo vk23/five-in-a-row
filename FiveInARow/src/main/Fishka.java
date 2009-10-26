@@ -11,7 +11,7 @@ import javax.swing.ImageIcon;
 
 /**
  *Интерфейс, описывающий игровые фишки.
- * Его реализации: White(), Black() - описывают конкретные фишки.
+ * Его реализации: Cross(), Zero() - описывают конкретные фишки.
  * @author kaligula
  */
 
@@ -27,8 +27,8 @@ public interface Fishka extends Serializable{
         Icon getIcon();     
 }
 
-//Класс, описывающий белые фишки(крестики).
-class White implements Fishka {
+//Класс, описывающий крестики.
+class Cross implements Fishka {
         private int i=1;
         private ImageIcon icon=new ImageIcon(Starter.class.getResource("resources/null.png"));
         public int get() {
@@ -38,8 +38,8 @@ class White implements Fishka {
                 return icon;
         }
 }
-//Класс, описывающий черные фишки(нолики).
-class Black implements Fishka {
+//Класс, описывающий нолики.
+class Zero implements Fishka {
         private int i=-1;
         private ImageIcon icon=new ImageIcon(Starter.class.getResource("resources/cross.png"));
         public int get() {

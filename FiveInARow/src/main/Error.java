@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package main;
 
@@ -12,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -31,6 +26,8 @@ public class Error extends JDialog implements ActionListener{
 
                 //Настраиваем диалоговое окно.
                 Point p=Helper.START_LOCATION;
+                setTitle("Oops!");
+
                 setLocation(new Point(p.x+150,p.y+200));                
                 setLayout(new GridLayout(2,1));
                 setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -39,12 +36,13 @@ public class Error extends JDialog implements ActionListener{
                 setResizable(false);
                 
                 //Создаем надпись, содержащую информацию об ошибке.                
-                JLabel lab=new JLabel(error);
-                lab.setFont(Helper.SMALL_FONT);
+                JLabel lab=new JLabel(" "+error+" ");
+                lab.setFont(Helper.SMALL_FONT);                
                 add(lab);
 
                 //Кнопка ОК.
-                JButton ok=new JButton("OK");                
+                JButton ok=new JButton("OK");
+                ok.setFocusPainted(false);
                 ok.addActionListener(this);
                 JPanel jpanel=new JPanel(new FlowLayout());
                 jpanel.add(ok);
@@ -56,6 +54,5 @@ public class Error extends JDialog implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
                 this.dispose();
-//                System.exit(1);
         }
 }

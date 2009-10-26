@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package main;
 
@@ -29,11 +25,12 @@ public class GameFrame extends JFrame {
         private boolean moveDone=false;
         private int lastIndex;
         private Color defaultCellColor=Helper.DEFAULT_COLOR;       
-        private JMenuBar menuBar;
+        private Menu menuBar;
         private InfoPanel infoPanel;
         private JPanel cellPanel;
         private Player player;
         private Player opponent;
+        boolean connectionLost=true;
 
 ////////////////////////////////////////////////Constructors////////////////////////////////////////////////////
         
@@ -63,11 +60,32 @@ public class GameFrame extends JFrame {
 
 //////////////////////////////////////////////Public methods//////////////////////////////////////////////////
 
-        public void setNewPlayerInfo(Player newPLayer) {
-                opponent=newPLayer;
-                infoPanel.setPlayersInfo(player,opponent);
-                System.out.println(opponent.getName());
+        /**
+         * Устанавливает информацию об оппоненте.
+         * @param newOpponent новый противник.
+         */
+        public void setOpponentInfo(Player newOpponent) {
+                opponent=newOpponent;
+//                if(opponent.getName().equals(player.getName())) {
+//                        opponent.setName("Clone detected");
+//                }
+                infoPanel.setPlayersInfo(player,opponent);                
         }
+
+        /**
+         * Устанавливает информацию об игроке.
+         * @param newPlayer новый игрок.
+         */
+        public void setPlayerInfo(Player newPlayer){
+                player=newPlayer;
+                try {
+                        sender.sendNewPlayerInfo(player);
+                } catch (IOException ex) {
+                        new Error("Exception: sendNewPlayerInfo()");
+                }
+                infoPanel.setPlayersInfo(player,opponent);    
+        }
+
         /**
          * Возвращает ссылку на игрока владельца поля.
          * @return
@@ -75,12 +93,13 @@ public class GameFrame extends JFrame {
         public Player getPlayer() {
                 return player;
         }
-        /**Начинаем игру(делаем кнопки активными).
+        /**Начинаем игру(делаем кнопки и элементы меню активными).
          */
-        public void enableCells() {
+        public void enableElements() {
                 for(Cell cell:cells) {
                         cell.setEnabled(true);
                 }
+                menuBar.enableMenuItems();
         }
         /**Установка данных по-умолчанию(из сети). Смотри setData(int row,int col, Fishka fishka,boolean fromNet);
          * @param row х координата клетки.
@@ -160,7 +179,7 @@ public class GameFrame extends JFrame {
          * @return Возвращает true если противник сделал свой ход.
          */
         public boolean isMoveDone() {
-                return moveDone;
+                return moveDone&&!connectionLost;
         }
         /**
          * Сохраняет результат текущего игрока и завершает программу.
@@ -189,7 +208,7 @@ public class GameFrame extends JFrame {
                 //Создаем панель меню.
                 menuBar=new Menu(this);
                 setJMenuBar(menuBar);
-
+                
                 //Создаем клеточное поле.
                 cellPanel=new JPanel(new GridLayout(DIM, DIM));
                 add(cellPanel);
@@ -239,6 +258,7 @@ public class GameFrame extends JFrame {
                         cellPanel.add(cells[i],i);
                 }
                 cellPanel.validate();
+                connectionLost=false;
         }
         private void restoreTheField() {
                 //Удаляем и создаем новые клетки.

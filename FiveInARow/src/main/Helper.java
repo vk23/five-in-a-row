@@ -43,7 +43,7 @@ public class Helper {
          * @return возвращает объект, содержащий информацию об игроке.
          */
         @SuppressWarnings("unchecked")
-        public static Player identifyPlayer(String playerName, Fishka f) {
+        public static Player identifyPlayer(String playerName) {
                 Player newP=null;
                 HashMap<String,Player> records=null; 
 
@@ -61,7 +61,7 @@ public class Helper {
                 }
                
                 if(newP==null) {
-                        newP=new Player(playerName, f);
+                        newP=new Player(playerName);
                         System.out.println("created new player");
                 }
                 return newP;

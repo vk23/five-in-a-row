@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package main;
 
@@ -10,9 +6,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
-import javax.sound.midi.MidiUnavailableException;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -24,7 +20,7 @@ import javax.swing.JMenuItem;
 public class Menu extends JMenuBar implements ActionListener,ItemListener{
         private GameFrame gameFrame;
         private JMenu mainMenu,helpMenu, soundMenu;
-        private JMenuItem start,exit,help,about, song1, song2,songoff;
+        private JMenuItem start,exit,help,about, song1, song2,songoff,changeName;
         private Sound sound;
         ButtonGroup group;
         
@@ -50,10 +46,14 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
                 soundMenu=new JMenu("Sound");
 
                 //Создаем элементы меню.
-                start=new JMenuItem("New game");                
+                start=new JMenuItem("New game");
+                start.setEnabled(false);
+                changeName=new JMenuItem("New player");
+                changeName.setEnabled(false);
                 exit=new JMenuItem("Exit");
                 about=new JMenuItem("About");
                 help=new JMenuItem("Help");
+                //Создаем элементы подменю звука.
                 song1=new JCheckBoxMenuItem("Memory Remains");
                 song1.setName("song1");
                 song2=new JCheckBoxMenuItem("Memory Remains 2");
@@ -69,6 +69,7 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
                 
                 //Вешаем на них лисенеры.
                 start.addActionListener(this);
+                changeName.addActionListener(this);
                 exit.addActionListener(this);
                 about.addActionListener(this);
                 help.addActionListener(this);
@@ -81,6 +82,7 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
                 soundMenu.add(song1);
                 soundMenu.add(song2);
                 mainMenu.add(start);
+                mainMenu.add(changeName);
                 mainMenu.add(soundMenu);
                 mainMenu.addSeparator();
                 mainMenu.add(exit);                
@@ -107,11 +109,14 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
                                         new Error("IOException within restartGame()");
                                 }                        
                 }
+                else if(action.equals("New player")) {                       
+                        new SetPlayerName(gameFrame);                                                        
+                }
                 else if(action.equals("About")) {
-                        System.out.println("About");                        
+                        new About();
                 }
                 else if(action.equals("Help")) {
-                        System.out.println("Help");
+                        new Help();
                 }
         }
         /**Обработка событий чекбоксов.
@@ -136,4 +141,9 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
                         }
                 }                 
         }
+
+        public void enableMenuItems() {
+                start.setEnabled(true);
+                changeName.setEnabled(true); 
+        }        
 }

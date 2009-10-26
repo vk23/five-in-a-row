@@ -93,7 +93,7 @@ public class Transporter implements Sender,Runnable{
                         in=new ObjectInputStream(socket.getInputStream());
 
                         //Делаем клетки активными, т.к. подключился клиент
-                        game.enableCells();
+                        game.enableElements();
                         //Отсылаем данные об игроке.
                         sendNewPlayerInfo(game.getPlayer());
                         
@@ -104,7 +104,7 @@ public class Transporter implements Sender,Runnable{
 
                                 if(obj instanceof Player) {
                                         Player player=(Player)obj;
-                                        game.setNewPlayerInfo(player);
+                                        game.setOpponentInfo(player);
                                 }
                                 else if(obj instanceof NewGame){
                                         NewGame newGame=(NewGame)obj;
@@ -118,6 +118,7 @@ public class Transporter implements Sender,Runnable{
                         
                 } catch (IOException ex) {
                         new Error( "Connection problem");
+                        game.connectionLost=true;
                 } catch (InterruptedException ex) {
                         new Error( ex.toString());
                 } catch (ClassNotFoundException ex) {

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package main;
 
@@ -12,10 +8,15 @@ import java.io.Serializable;
  * @author kaligula
  */
 public class Player implements Serializable{
+
         private String name;
         private int win;
         private Fishka fishka;
 
+        public Player(String name) {
+                this.name=name;
+        }
+        
         public Player(String name, Fishka f) {
                 this.name=name;
                 fishka=f;
@@ -34,5 +35,12 @@ public class Player implements Serializable{
         }
         public void increaseWinCounter() {
                 win++;
+        }
+        public void setName(String newName) {
+                name=newName;
+        }
+
+        public void setFishka(Fishka f) {
+                fishka=f;
         }
 }
