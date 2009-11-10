@@ -8,7 +8,6 @@ import java.awt.event.ItemListener;
 import java.io.IOException;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -20,7 +19,7 @@ import javax.swing.JMenuItem;
 public class Menu extends JMenuBar implements ActionListener,ItemListener{
         private GameFrame gameFrame;
         private JMenu mainMenu,helpMenu, soundMenu;
-        private JMenuItem start,exit,help,about, song1, song2,songoff,changeName;
+        private JMenuItem start,exit,help,about, song1, song2,song3,song4,songoff,changeName;
         private Sound sound;
         ButtonGroup group;
         
@@ -58,6 +57,10 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
                 song1.setName("song1");
                 song2=new JCheckBoxMenuItem("Memory Remains 2");
                 song2.setName("song2");
+                song3=new JCheckBoxMenuItem("The Day That Never Comes");
+                song3.setName("song3");
+                song4=new JCheckBoxMenuItem("Night Time Eclipse");
+                song4.setName("song4");
                 songoff=new JCheckBoxMenuItem("Off");
                 songoff.setName("Off");
                 
@@ -66,6 +69,8 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
                 group.add(songoff);
                 group.add(song1);
                 group.add(song2);
+                group.add(song3);
+                group.add(song4);
                 
                 //Вешаем на них лисенеры.
                 start.addActionListener(this);
@@ -75,12 +80,19 @@ public class Menu extends JMenuBar implements ActionListener,ItemListener{
                 help.addActionListener(this);
                 song1.addItemListener(this);
                 song2.addItemListener(this);
+                song3.addItemListener(this);
+                song4.addItemListener(this);
                 songoff.addItemListener(this);
                 
                 //Добавляем элементы в меню.
                 soundMenu.add(songoff);
+                soundMenu.addSeparator();
                 soundMenu.add(song1);
                 soundMenu.add(song2);
+                soundMenu.add(song3);
+                soundMenu.addSeparator();
+                soundMenu.add(song4);
+                
                 mainMenu.add(start);
                 mainMenu.add(changeName);
                 mainMenu.add(soundMenu);
